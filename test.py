@@ -1,11 +1,10 @@
 import requests
 
-a = requests.post(
-    "http://127.0.0.1:5000/api/contact",
-    json={"token": "teste"},
+a = requests.get(
+    "http://127.0.0.1:5000/api/contact/",
     headers={
-        "authorization_token": """ya29.a0AfH6SMAT2LtREYZIRBUgoaWyzOmLbcmu-v76OeR6odfU22uow-sOo2bBrjwT1db9vu9yF4XvAQUJG5pOr8phPdXf_yiLM2zQrpUZITcAJQe6CFVnseaevtfb9oKaTEtQb6fnK28qjJpX-QUAF9h6zR8sElPrnkU2gSTkAPS5XMgu"""
+        "authorization-code": """ya29.A0AfH6SMBYT3F93H8gDRwG39XsrCu0hLt3tWHv-wZpGuvSgGwt88fRrK1MneOQF-HbzGxoyTG9qzkU8538nipfWnwPHedAS4VEosWRTJKLHJHuz1oVKeM4Rf-e-sVteCjQySLsOmSToNyQttMOgfRFbH5X8LE9UQ"""
     },
 )
 
-print(a)
+print(a.text)
