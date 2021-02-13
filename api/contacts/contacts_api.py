@@ -52,9 +52,8 @@ class ContactApi(Resource):
                     return json_data, 402
             else:
                 # Processar os dados e transformar em algo simples p/ front
-
-                Contact.multiples_json_contacts_to_objects(json_data)
-                return json_data, 200
+                return Contact.multiples_json_contacts_to_objects(json_data), 200
+                
         else:
             print("Aqui")
             return {"error": "No authentication-code in headers"}, 400

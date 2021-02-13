@@ -53,7 +53,9 @@ class Contact(Model):
                 id=connection["resourceName"].split("/")[1],
                 name=connection["names"][0]["displayName"],
                 photo_url=connection["photos"][0]["url"],
-                email=connection["emailAddresses"][0]["url"],
+                email=connection["emailAddresses"][0]["value"],
             )
 
             data["contacts"].append(new_contact.to_dict())
+            
+        return data
