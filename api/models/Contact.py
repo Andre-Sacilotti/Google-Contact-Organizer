@@ -57,5 +57,35 @@ class Contact(Model):
             )
 
             data["contacts"].append(new_contact.to_dict())
-            
+
         return data
+
+    @staticmethod
+    def _get_domain(data):
+        print(data["email"].split("@"))
+        return data["email"].split("@")[1]
+
+    @staticmethod
+    def get_unique_domains(data):
+
+        domains = set()
+
+        for connection in data:
+            domains.add(Contact._get_domain(connection))
+
+        return domains
+
+    @staticmethod
+    def group_by_email_group(data):
+        data = data["contacts"]
+
+        domains = Contact.get_unique_domains(data)
+
+        domains_grouped = {}
+
+        for domain in domains:
+            domains_grouped[domain] = []
+
+        for connection in data:
+            domains_grouped[Contact._get_domain(connection)].append(connection)
+        return domains_grouped

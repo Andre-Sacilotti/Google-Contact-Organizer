@@ -29,12 +29,9 @@ class ContactApi(Resource):
     """Restful API to deal with contacts."""
 
     def get(self):
-        """Get method that return a dictionary with useful informations."""
-        print("Aqui1")
+        """Get method that return a dictionary with grouped contacts by email domain"""
         token = request.headers.get("authorization-code")
-        print("Aqui2")
         if token is not None:
-            print("Aqui3")
             authorization_header = {"Authorization": "Bearer %s" % token}
 
             r = requests.get(
@@ -52,8 +49,13 @@ class ContactApi(Resource):
                     return json_data, 402
             else:
                 # Processar os dados e transformar em algo simples p/ front
-                return Contact.multiples_json_contacts_to_objects(json_data), 200
-                
+
+                objects = Contact.multiples_json_contacts_to_objects(json_data)
+
+                grouped_by_domains = Contact.group_by_email_group(objects)
+
+                return (grouped_by_domains, 200)
+
         else:
             print("Aqui")
             return {"error": "No authentication-code in headers"}, 400
