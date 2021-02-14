@@ -1,6 +1,8 @@
 """Contact Model. Stores email, photo url and name."""
 from fireo.models import Model
 from fireo.fields import TextField
+import logging
+from datetime import datetime
 
 
 class Contact(Model):
@@ -101,14 +103,27 @@ class Contact(Model):
         data = {"contacts": []}
 
         for connection in connections:
-            new_contact = Contact(
-                id=connection["resourceName"].split("/")[1],
-                name=connection["names"][0]["displayName"],
-                photo_url=connection["photos"][0]["url"],
-                email=connection["emailAddresses"][0]["value"],
-            )
-
-            data["contacts"].append(new_contact.to_dict())
+            try:
+                new_contact = Contact(
+                    id=connection["resourceName"].split("/")[1],
+                    name=connection.get(
+                        "names", [{"displayName": "Missin Name"}]
+                    )[0]["displayName"],
+                    photo_url=connection.get("photos", [{"url": ""}])[0][
+                        "url"
+                    ],
+                    email=connection["emailAddresses"][0]["value"],
+                )
+                data["contacts"].append(new_contact.to_dict())
+            except KeyError as e:
+                if "emailAddresses" in str(e):
+                    pass
+                else:
+                    logging.warning(
+                        "[Contact.py] Exception Error at {}, returning KeyError {}".format(
+                            datetime.now(), str(e)
+                        )
+                    )
 
         return data
 
@@ -188,4 +203,21 @@ class Contact(Model):
 
         for connection in data:
             domains_grouped[Contact._get_domain(connection)].append(connection)
-        return domains_grouped
+
+        return {"contacts": domains_grouped}
+        
+        
+    @staticmethod
+    def _get_specific_contact_informations(data):
+        
+        address = data.get("addresses", [{'streetAddress': 'Missing'}])[0].get("streetAddress")
+        birth_date = data.get("birthdays", [{'text': 'Missing'}])[0].get("text")
+        organization = data.get("organizations", [{'name': 'Missing'}])[0].get("name")
+        occupation = data.get("organizations", [{'title': 'Missing'}])[0].get("title")
+        
+        return {
+            'address': address,
+            'birth_date': birth_date,
+            'organization': organization,
+            'occupation': occupation
+        }

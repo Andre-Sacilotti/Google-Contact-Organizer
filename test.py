@@ -1,10 +1,17 @@
 import requests
+import json
 
-a = requests.get(
-    "http://127.0.0.1:5000/api/contact/",
+a = requests.put(
+    "http://127.0.0.1:5000/api/user/",
     headers={
-        "authorization-code": """ya29.a0AfH6SMA-6tQNjPGY2uPMIylvq4zv79mN4C4GQD-AFoZma3zxHVAgYyN-_NZjhM-jeetsuDMeHByT23S9tzlEKC4f4HWIbOIPFJt0AnvH3faIAQzRnJCgApdyD81yNshRz5nqa2ZxR9tLyz1nEoh3s2UtZPTqI8ZJU1IccZu1dqki"""
+        "authorization-code": """ya29.A0AfH6SMDqtWQvFED6jDVVPR0cEJQ72FifVlpCrvKIg2ybNtku5r88YbG9OwiLmCYP4Uftd2ls_6Hxv_WG6JgukvUxFdGtnEyml0LVJ9XnJb7gyoZg3sOn_qagocaUCmCvGU2-yIaeYooMDgamiSJn9g9ZUiomHQ"""
     },
+    data=json.dumps({
+        'user_id': "ID TESTE",
+        'user_email': "EMAIL",
+        'user_name': "NOMEEE" 
+        
+    })
 )
 
 print(a.text)

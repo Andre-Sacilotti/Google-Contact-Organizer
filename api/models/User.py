@@ -1,5 +1,5 @@
 """User Model, stores id, name and contacts."""
-from fireo.fields import TextField, ListField
+from fireo.fields import TextField, ListField, IDField
 from fireo.models import Model
 
 
@@ -14,12 +14,11 @@ class User(Model):
         User display name.
     contacts : list
         List with contacts objects.
-    photo_url : str
-        Profile photo url.
+    email : str
+        Profile email.
 
     """
-
-    id = TextField(primary_key=True)
+    id = IDField()
     name = TextField()
     contacts = ListField()
-    photo_url = TextField()
+    email = TextField()
