@@ -12,8 +12,7 @@ api_blueprint = Api(
     description="Deal with some google people api requests",
 )
 
-CORS(application, resources={r'/*': {'origins': '*'}})
-
+CORS(application, resources={r"/*": {"origins": "*"}})
 
 
 import api.user.user_api

@@ -18,6 +18,14 @@ class Contact(Model):
         Url from profile photo, can be found in photos > url from google json
     email : str
         Contact email, given in emailAddresses > value
+    organization : str
+        Contact organization that works/study/volunteer
+    job : str
+        Contact job title, like developer, manager
+    city : str
+        Contact city.
+    region : str.
+        Contact city
 
     """
 
@@ -25,6 +33,10 @@ class Contact(Model):
     name = TextField()
     photo_url = TextField()
     email = TextField()
+    organization = TextField()
+    job = TextField()
+    city = TextField()
+    region = TextField()
 
     def to_dict(self):
         """Convert an Contact objecto to a dictionary.
@@ -48,6 +60,10 @@ class Contact(Model):
             "name": self.name,
             "photo_url": self.photo_url,
             "email": self.email,
+            "job": self.job,
+            "organization": self.organization,
+            "region": self.region,
+            "city": self.city,
         }
 
     @staticmethod
@@ -60,6 +76,10 @@ class Contact(Model):
             "name": self.name,
             "photo_url": self.photo_url,
             "email": self.email,
+            "job":
+            "organization":
+            "region":
+            "city":
         }
 
         Parameters
@@ -73,6 +93,10 @@ class Contact(Model):
             name=data["name"],
             photo_url=data["photo_url"],
             email=data["email"],
+            job=data["job"],
+            organization=data["organization"],
+            region=data["region"],
+            city=data["city"],
         )
 
     @staticmethod
@@ -113,12 +137,22 @@ class Contact(Model):
                         "url"
                     ],
                     email=connection["emailAddresses"][0]["value"],
-                    organization=connection.get("organizations", [{'name':"Missing"}])[0]["name"],
-                    job=connection.get("organizations", [{'title':"Missing"}])[0]["title"],
-                    city=connection.get("addresses", [{'city':"Missing"}])[0]["city"],
-                    region=connection.get("addresses", [{'region':"Missing"}])[0]["region"]
+                    organization=connection.get(
+                        "organizations", [{"name": "Missing"}]
+                    )[0]["name"],
+                    job=connection.get(
+                        "organizations", [{"title": "Missing"}]
+                    )[0]["title"],
+                    city=connection.get("addresses", [{"city": "Missing"}])[0][
+                        "city"
+                    ],
+                    region=connection.get(
+                        "addresses", [{"region": "Missing"}]
+                    )[0]["region"],
                 )
                 data["contacts"].append(new_contact.to_dict())
+                print(new_contact.to_dict())
+                print("\n\n")
             except KeyError as e:
                 if "emailAddresses" in str(e):
                     pass
@@ -173,7 +207,7 @@ class Contact(Model):
             domains.add(Contact._get_domain(connection))
 
         return domains
-    
+
     @staticmethod
     def _get_organization(data):
         """Get the organization.
@@ -189,8 +223,8 @@ class Contact(Model):
             String containing the organization
 
         """
-        return data["organization"]
-        
+        return data.get("organization", "Missing")
+
     @staticmethod
     def _get_job(data):
         """Get the job title.
@@ -206,8 +240,8 @@ class Contact(Model):
             String containing the job title
 
         """
-        return data["job"]  
-        
+        return data.get("job", "Missing")
+
     @staticmethod
     def _get_city(data):
         """Get the city.
@@ -223,8 +257,8 @@ class Contact(Model):
             String containing the city
 
         """
-        return data["city"]
-        
+        return data.get("city", "Missing")
+
     @staticmethod
     def _get_region(data):
         """Get the organization.
@@ -240,8 +274,8 @@ class Contact(Model):
             String containing the organization
 
         """
-        return data["region"]
-        
+        return data.get("region", "Missing")
+
     @staticmethod
     def get_unique_organizations(data):
         """Get a set of unique organizations in a list of contacts.
@@ -263,7 +297,7 @@ class Contact(Model):
             domains.add(Contact._get_organization(connection))
 
         return domains
-        
+
     @staticmethod
     def get_unique_job(data):
         """Get a set of unique job in a list of contacts.
@@ -307,7 +341,7 @@ class Contact(Model):
             domains.add(Contact._get_city(connection))
 
         return domains
-        
+
     @staticmethod
     def get_unique_region(data):
         """Get a set of unique region in a list of contacts.
@@ -365,8 +399,7 @@ class Contact(Model):
             domains_grouped[Contact._get_domain(connection)].append(connection)
 
         return {"contacts": domains_grouped}
-        
-        
+
     @staticmethod
     def get_quantity_per_domain(data):
         """Get a dict with quantity of contacts per domain
@@ -402,23 +435,30 @@ class Contact(Model):
             domains_grouped[Contact._get_domain(connection)] += 1
 
         return {"contacts": domains_grouped}
-        
-        
+
     @staticmethod
     def _get_specific_contact_informations(data):
-        
-        address = data.get("addresses", [{'streetAddress': 'Missing'}])[0].get("streetAddress")
-        birth_date = data.get("birthdays", [{'text': 'Missing'}])[0].get("text")
-        organization = data.get("organizations", [{'name': 'Missing'}])[0].get("name")
-        occupation = data.get("organizations", [{'title': 'Missing'}])[0].get("title")
-        
+
+        address = data.get("addresses", [{"streetAddress": "Missing"}])[0].get(
+            "streetAddress"
+        )
+        birth_date = data.get("birthdays", [{"text": "Missing"}])[0].get(
+            "text"
+        )
+        organization = data.get("organizations", [{"name": "Missing"}])[0].get(
+            "name"
+        )
+        occupation = data.get("organizations", [{"title": "Missing"}])[0].get(
+            "title"
+        )
+
         return {
-            'address': address,
-            'birth_date': birth_date,
-            'organization': organization,
-            'occupation': occupation
+            "address": address,
+            "birth_date": birth_date,
+            "organization": organization,
+            "occupation": occupation,
         }
-        
+
     @staticmethod
     def get_quantity_per_organization(data):
         """Get a dict with quantity of contacts per organization
@@ -451,8 +491,7 @@ class Contact(Model):
             organizations_grouped[Contact._get_organization(connection)] += 1
 
         return {"contacts": organizations_grouped}
-        
-        
+
     @staticmethod
     def get_quantity_per_job(data):
         """Get a dict with quantity of contacts per job
@@ -482,10 +521,10 @@ class Contact(Model):
             jobs_grouped[job] = 0
 
         for connection in data:
-            jobs_grouped[Contact._get_jobs(connection)] += 1
+            jobs_grouped[Contact._get_job(connection)] += 1
 
         return {"contacts": jobs_grouped}
-        
+
     @staticmethod
     def get_quantity_per_city(data):
         """Get a dict with quantity of contacts per city
@@ -518,8 +557,7 @@ class Contact(Model):
             city_grouped[Contact._get_city(connection)] += 1
 
         return {"contacts": city_grouped}
-        
-        
+
     @staticmethod
     def get_quantity_per_region(data):
         """Get a dict with quantity of contacts per region

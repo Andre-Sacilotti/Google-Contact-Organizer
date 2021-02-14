@@ -17,6 +17,7 @@ class User(Model):
         contacts per domain, contacts per City Adresss, contacts per organization
 
     """
+
     id = IDField()
     name = TextField()
     contacts_statistics = MapField()
