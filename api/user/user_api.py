@@ -5,6 +5,7 @@ from api.ApiCodes import NO_AUTH_CODE, INVALID_CREDENTIALS
 from api.models.User import User
 from api.contacts.contacts_api import ContactApi
 from api.models.Contact import Contact
+import json
 
 
 user_namespace = api_blueprint.namespace(
@@ -30,16 +31,18 @@ model = user_namespace.model(
         460: "No authorization-code in headers",
         462: "Another errors",
         463: "Argument missing in request data",
+        465: "User Not Found"
     }
 )
-@user_namespace.header(
-    "authorization-code",
-    "OAuth2 Access Token given by google api.",
-    required=True,
-)
+
 @user_namespace.route("/")
-@user_namespace.doc(body=model)
 class UserApi(Resource):
+    
+    @user_namespace.header(
+        "authorization-code",
+        "OAuth2 Access Token given by google api.",
+        required=True,
+    )
     @user_namespace.doc(body=model)
     def put(self):
 
@@ -58,7 +61,7 @@ class UserApi(Resource):
                     463,
                 )
 
-            user = User(id=id, name=name)
+            user = User(id=id, name=name, query_id=id)
 
             auxapi = ContactApi()
 
@@ -91,9 +94,24 @@ class UserApi(Resource):
                     "region": contacts_statistics_region["contacts"],
                 }
                 user.save()
-                return "a", 200
+                return {'success': "User Saved"}, 200
 
             return contacts
 
         else:
             return NO_AUTH_CODE
+            
+
+    @user_namespace.doc(params={
+        'userId': "User unique id to get data on Firebase DB"
+    })
+    def get(self):
+        print(request)
+        data = request.args
+        user_data = User.collection.filter(query_id=data.get("userId", None))
+
+        if user_data.get() is not None:
+            return user_data.get().to_dict(), 200
+        else:
+            return {'error': "User not found."}, 465
+

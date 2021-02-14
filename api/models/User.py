@@ -19,5 +19,6 @@ class User(Model):
     """
 
     id = IDField()
+    query_id = TextField()
     name = TextField()
     contacts_statistics = MapField()
