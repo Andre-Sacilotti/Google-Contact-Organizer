@@ -113,6 +113,10 @@ class Contact(Model):
                         "url"
                     ],
                     email=connection["emailAddresses"][0]["value"],
+                    organization=connection.get("organizations", [{'name':"Missing"}])[0]["name"],
+                    job=connection.get("organizations", [{'title':"Missing"}])[0]["title"],
+                    city=connection.get("addresses", [{'city':"Missing"}])[0]["city"],
+                    region=connection.get("addresses", [{'region':"Missing"}])[0]["region"]
                 )
                 data["contacts"].append(new_contact.to_dict())
             except KeyError as e:
@@ -169,6 +173,162 @@ class Contact(Model):
             domains.add(Contact._get_domain(connection))
 
         return domains
+    
+    @staticmethod
+    def _get_organization(data):
+        """Get the organization.
+
+        Parameters
+        ----------
+        data : Union[Dict, Contact]
+            Contact specific data, given in a dict format ou Contact object
+
+        Returns
+        -------
+        str
+            String containing the organization
+
+        """
+        return data["organization"]
+        
+    @staticmethod
+    def _get_job(data):
+        """Get the job title.
+
+        Parameters
+        ----------
+        data : Union[Dict, Contact]
+            Contact specific data, given in a dict format ou Contact object
+
+        Returns
+        -------
+        str
+            String containing the job title
+
+        """
+        return data["job"]  
+        
+    @staticmethod
+    def _get_city(data):
+        """Get the city.
+
+        Parameters
+        ----------
+        data : Union[Dict, Contact]
+            Contact specific data, given in a dict format ou Contact object
+
+        Returns
+        -------
+        str
+            String containing the city
+
+        """
+        return data["city"]
+        
+    @staticmethod
+    def _get_region(data):
+        """Get the organization.
+
+        Parameters
+        ----------
+        data : Union[Dict, Contact]
+            Contact specific data, given in a dict format ou Contact object
+
+        Returns
+        -------
+        str
+            String containing the organization
+
+        """
+        return data["region"]
+        
+    @staticmethod
+    def get_unique_organizations(data):
+        """Get a set of unique organizations in a list of contacts.
+
+        Parameters
+        ----------
+        data : List
+            A list with multiples contacts
+
+        Returns
+        -------
+        set
+            A set composed by unique organizations found in data
+
+        """
+        domains = set()
+
+        for connection in data:
+            domains.add(Contact._get_organization(connection))
+
+        return domains
+        
+    @staticmethod
+    def get_unique_job(data):
+        """Get a set of unique job in a list of contacts.
+
+        Parameters
+        ----------
+        data : List
+            A list with multiples contacts
+
+        Returns
+        -------
+        set
+            A set composed by unique job found in data
+
+        """
+        domains = set()
+
+        for connection in data:
+            domains.add(Contact._get_job(connection))
+
+        return domains
+
+    @staticmethod
+    def get_unique_city(data):
+        """Get a set of unique city in a list of contacts.
+
+        Parameters
+        ----------
+        data : List
+            A list with multiples contacts
+
+        Returns
+        -------
+        set
+            A set composed by unique city found in data
+
+        """
+        domains = set()
+
+        for connection in data:
+            domains.add(Contact._get_city(connection))
+
+        return domains
+        
+    @staticmethod
+    def get_unique_region(data):
+        """Get a set of unique region in a list of contacts.
+
+        Parameters
+        ----------
+        data : List
+            A list with multiples contacts
+
+        Returns
+        -------
+        set
+            A set composed by unique region found in data
+
+        """
+        domains = set()
+
+        for connection in data:
+            domains.add(Contact._get_region(connection))
+
+        return domains
 
     @staticmethod
     def group_by_email_group(data):
@@ -208,6 +368,43 @@ class Contact(Model):
         
         
     @staticmethod
+    def get_quantity_per_domain(data):
+        """Get a dict with quantity of contacts per domain
+
+        This methods creates an dictionary with key as unique domain and pass
+        a integer number representing how much contacts has this domain
+
+        Parameters
+        ----------
+        data : List
+            List of contacts
+
+        Returns
+        -------
+        dict
+            Dictionary following this structure:
+            {
+                'domain1': 3,
+                'domain2': 1
+            }
+
+        """
+        data = data["contacts"]
+
+        domains = Contact.get_unique_domains(data)
+
+        domains_grouped = {}
+
+        for domain in domains:
+            domains_grouped[domain] = 0
+
+        for connection in data:
+            domains_grouped[Contact._get_domain(connection)] += 1
+
+        return {"contacts": domains_grouped}
+        
+        
+    @staticmethod
     def _get_specific_contact_informations(data):
         
         address = data.get("addresses", [{'streetAddress': 'Missing'}])[0].get("streetAddress")
@@ -221,3 +418,137 @@ class Contact(Model):
             'organization': organization,
             'occupation': occupation
         }
+        
+    @staticmethod
+    def get_quantity_per_organization(data):
+        """Get a dict with quantity of contacts per organization
+
+        Parameters
+        ----------
+        data : List
+            List of contacts
+
+        Returns
+        -------
+        dict
+            Dictionary following this structure:
+            {
+                'organization1': 3,
+                'organization2': 1
+            }
+
+        """
+        data = data["contacts"]
+
+        organizations = Contact.get_unique_organizations(data)
+
+        organizations_grouped = {}
+
+        for org in organizations:
+            organizations_grouped[org] = 0
+
+        for connection in data:
+            organizations_grouped[Contact._get_organization(connection)] += 1
+
+        return {"contacts": organizations_grouped}
+        
+        
+    @staticmethod
+    def get_quantity_per_job(data):
+        """Get a dict with quantity of contacts per job
+
+        Parameters
+        ----------
+        data : List
+            List of contacts
+
+        Returns
+        -------
+        dict
+            Dictionary following this structure:
+            {
+                'job_title1': 3,
+                'job_title2': 1
+            }
+
+        """
+        data = data["contacts"]
+
+        jobs = Contact.get_unique_job(data)
+
+        jobs_grouped = {}
+
+        for job in jobs:
+            jobs_grouped[job] = 0
+
+        for connection in data:
+            jobs_grouped[Contact._get_jobs(connection)] += 1
+
+        return {"contacts": jobs_grouped}
+        
+    @staticmethod
+    def get_quantity_per_city(data):
+        """Get a dict with quantity of contacts per city
+
+        Parameters
+        ----------
+        data : List
+            List of contacts
+
+        Returns
+        -------
+        dict
+            Dictionary following this structure:
+            {
+                'city1': 3,
+                'city2': 1
+            }
+
+        """
+        data = data["contacts"]
+
+        citys = Contact.get_unique_city(data)
+
+        city_grouped = {}
+
+        for city in citys:
+            city_grouped[city] = 0
+
+        for connection in data:
+            city_grouped[Contact._get_city(connection)] += 1
+
+        return {"contacts": city_grouped}
+        
+        
+    @staticmethod
+    def get_quantity_per_region(data):
+        """Get a dict with quantity of contacts per region
+
+        Parameters
+        ----------
+        data : List
+            List of contacts
+
+        Returns
+        -------
+        dict
+            Dictionary following this structure:
+            {
+                'region1': 3,
+                'region2': 1
+            }
+
+        """
+        data = data["contacts"]
+
+        regions = Contact.get_unique_region(data)
+
+        region_grouped = {}
+
+        for region in regions:
+            region_grouped[region] = 0
+
+        for connection in data:
+            region_grouped[Contact._get_region(connection)] += 1
+
+        return {"contacts": region_grouped}

@@ -4,6 +4,7 @@ from flask import request
 from api.ApiCodes import NO_AUTH_CODE, INVALID_CREDENTIALS
 from api.models.User import User
 from api.contacts.contacts_api import ContactApi
+from api.models.Contact import Contact
 
 
 user_namespace = api_blueprint.namespace(
@@ -43,24 +44,31 @@ class UserApi(Resource):
             
             id = data.get("user_id", None)
             name = data.get("user_name", None)
-            email = data.get("user_email", None)
             
-            if id is None or name is None or email is None:
+            if id is None or name is None:
                 return {"error": "Some body arguments is missing. It needs id, email and name"}, 463
             
             user = User(
                 id=id,
-                name=name,
-                email=email
-                            )
-            
-            user.save()
+                name=name)
             
             auxapi = ContactApi()
             
-            print("running API")
-            print(auxapi._get_list_of_contacts())
-            print("Finished API")
+            contacts = auxapi._get_list_of_contacts(grouped=False)
+            
+            if contacts[1] == 200:
+                contacts_statistics = Contact.get_quantity_per_domain(contacts[0])
+                
+                contacts_statistics_organization = Contact.get_quantity_per_organization(contacts[0])
+                
+                user.contacts_statistics = {
+                    "domain": contacts_statistics['contacts'],
+                    'organization': contacts_statistics_organization['contacts']
+                    }
+                user.save()
+                return "a", 200
+                
+            return contacts
             
         else:
             return NO_AUTH_CODE

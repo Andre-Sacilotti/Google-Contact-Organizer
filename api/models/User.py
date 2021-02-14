@@ -1,5 +1,5 @@
 """User Model, stores id, name and contacts."""
-from fireo.fields import TextField, ListField, IDField
+from fireo.fields import TextField, MapField, IDField
 from fireo.models import Model
 
 
@@ -12,13 +12,11 @@ class User(Model):
         User unique id composed by subject id given by google auth.
     name : str
         User display name.
-    contacts : list
-        List with contacts objects.
-    email : str
-        Profile email.
+    contacts_statistics : dict
+        dictionary containg the statistics about contacts, in other words,
+        contacts per domain, contacts per City Adresss, contacts per organization
 
     """
     id = IDField()
     name = TextField()
-    contacts = ListField()
-    email = TextField()
+    contacts_statistics = MapField()

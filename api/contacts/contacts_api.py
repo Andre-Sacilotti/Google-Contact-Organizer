@@ -38,12 +38,7 @@ class ContactApi(Resource):
     def _get_specific_contact(self, personId):
         token = request.headers.get("authorization-code")
         if token is not None:
-            print("Teste")
             authorization_header = {"Authorization": "Bearer %s" % token}
-
-            print("https://people.googleapis.com/v1/people/{contact_id}?{query}".format(
-                contact_id=personId, query="birthdays,addresses,organizations"
-            ))
 
             r = requests.get(
                 "https://people.googleapis.com/v1/people/{contact_id}?personFields={query}".format(
@@ -52,8 +47,6 @@ class ContactApi(Resource):
                 headers=authorization_header,
             )
 
-            print(r.text)
-            
             json_data = json.loads(r.text)
             
             if json_data.get("error", None) is not None:
@@ -68,16 +61,15 @@ class ContactApi(Resource):
         else:
             return NO_AUTH_CODE
     
-    def _get_list_of_contacts(self):
+    def _get_list_of_contacts(self, grouped=True):
         token = request.headers.get("authorization-code")
         if token is not None:
             authorization_header = {"Authorization": "Bearer %s" % token}
-            print("Before")
+
             r = requests.get(
-                "https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses,photos",
+                "https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses,photos,addresses,organizations",
                 headers=authorization_header,
             )
-            print("After")
 
             json_data = json.loads(r.text)
 
@@ -91,18 +83,20 @@ class ContactApi(Resource):
                 # Processar os dados e transformar em algo simples p/ front
 
                 objects = Contact.multiples_json_contacts_to_objects(json_data)
-
-                grouped_by_domains = Contact.group_by_email_group(objects)
-                sorted(
-                    grouped_by_domains,
-                    key=lambda k: len(grouped_by_domains[k]),
-                    reverse=False,
-                )
-
-                return (grouped_by_domains, 200)
+                
+                if(grouped):
+                    grouped_by_domains = Contact.group_by_email_group(objects)
+                    sorted(
+                        grouped_by_domains,
+                        key=lambda k: len(grouped_by_domains[k]),
+                        reverse=False,
+                    )
+                    return (grouped_by_domains, 200)
+                else:
+                    print(objects)
+                    return (objects, 200)
 
         else:
-            print("Aqui")
             return NO_AUTH_CODE
 
     def get(self):
@@ -114,7 +108,6 @@ class ContactApi(Resource):
             return self._get_list_of_contacts()
         else:
             aux = self._get_specific_contact(args['personId'])
-            print(aux)
             return aux
             
             
