@@ -10,7 +10,7 @@ You can check the swagger documentation here(WIP)
 
 ## How to use
 
-#### To run the testserver:
+#### To run the development server:
 
 ```bash
 pip install -r requirements.txt
@@ -22,6 +22,15 @@ And to check the api documentation locally,  access:
 localhost:5000/
 ```
 It will returns an Swagger UI
+
+#### Run development server on docker container
+
+```
+docker image build -t "conecta_api".
+
+docker container run -v /path/to/firebase/serviceaccount:/auth/ -p 5000:5000 --name api conecta_api python testserver.py
+```
+
 
 #### To run on production
 
