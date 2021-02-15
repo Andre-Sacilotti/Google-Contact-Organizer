@@ -6,6 +6,8 @@ from api.server import api_blueprint
 from flask_restplus import Resource, reqparse, fields
 from api.contacts.contacts_api import ContactApi
 
+import uuid
+
 
 import os
 
@@ -38,6 +40,15 @@ report_namespace = api_blueprint.namespace(
 class ReportApi(Resource):
     
     def get(self):
+        """GET endpoint that returns an excel report with contacts data.
+        
+        Returns
+        -------
+        str
+            Return an firebase storage link to download.
+        int:
+            Response code
+        """
         
         api = ContactApi()
         
@@ -64,14 +75,15 @@ class ReportApi(Resource):
                     else:
                         sheet1.write(line, column, value)
                         column += 1
-                        
-            wb.save('/tmp/test.xls')
+            
+            file_path = '/tmp/{}.xls'.format(uuid.uuid4())
+            wb.save(file_path)
             
             
             
             bucket = storage.bucket()
-            blob = bucket.blob("/tmp/test.xls")
-            blob.upload_from_filename("/tmp/test.xls")
+            blob = bucket.blob(file_path)
+            blob.upload_from_filename(file_path)
 
             blob.make_public()
             

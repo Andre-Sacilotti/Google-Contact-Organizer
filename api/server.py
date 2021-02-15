@@ -1,19 +1,28 @@
-from flask import Flask
+from flask import Flask, Blueprint, request, send_file, url_for
 from flask_cors import CORS
-from flask_restplus import Resource, Api
+from flask_restplus import Api, Namespace, Resource, fields
 import os
 
-application = Flask(__name__)
+app = Flask(__name__)
+
+if os.getenv("DEBUG") == 'true':
+    ...
+else:
+    @property
+    def specs_url(self):
+        return url_for(self.endpoint('specs'), _external=True, _scheme='https')
+ 
+    Api.specs_url = specs_url
 
 api_blueprint = Api(
-    application,
+    app,
     prefix="/api",
     version="0.1",
     title="Super OrgContact API",
     description="Deal with some google people api requests",
 )
 
-CORS(application, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 import api.user.user_api

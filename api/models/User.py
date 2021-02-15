@@ -26,7 +26,30 @@ class User(Model):
     
     @staticmethod
     def statistics_to_chart(data):
+        """Return a dictionary with label and data to plot statistics.
         
+        Parameters
+        ----------
+        data : Dict
+            Dictionary with contacts statistics in the following format:
+            {
+                'organization': {
+                    'google': 25, 'facebook': 30
+                },
+                ...
+            }
+            
+        Returns
+        -------
+        dict
+            Dictionary in the following format:
+            {
+                'organization': {
+                    'label': ["google", "facebook", ...],
+                    'data': [25, 30, ...]
+                }
+            }
+        """
         data = data['contacts_statistics']
         
         chart_data = {}

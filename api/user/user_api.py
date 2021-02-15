@@ -43,7 +43,14 @@ class UserApi(Resource):
     )
     @user_namespace.doc(body=model)
     def put(self):
-
+        """PUT endpoint that register a new user.
+        
+        Returns
+        dict
+            Dictionary containing error or success key.
+        int
+            Response Code
+        """
         token = request.headers.get("authorization-code")
         if token is not None:
             data = request.get_json(force=True)
@@ -113,11 +120,19 @@ class UserApi(Resource):
         }
     )
     def get(self):
-        print(request)
+        """GET endpoint that return user data from database.
+
+        Returns
+        -------
+        dict
+            Dictionary containg name, email and contacts statistics
+        int
+            Response Code
+        """
         data = request.args
         user_data = User.collection.filter(query_id=data.get("userId", None))
-
-        if data.get("toChart", None) == "true":
+        print("Tochart AQUIIIIIIIIIIII", data.get("toChart", None))
+        if data.get("toChart", None) == "chart":
             if user_data.get() is not None:
                 
                 return User.statistics_to_chart(

@@ -438,7 +438,25 @@ class Contact(Model):
 
     @staticmethod
     def _get_specific_contact_informations(data):
+        """Return specific information about a contact.
+        
+        Parameters
+        ----------
+        data : dict
+            Dictionary returned from google people api request
+            
+        Returns
+        -------
+        dict
+            Dictionary with only desired informations.
+            {
+                "address": address,
+                "birth_date": birth_date,
+                "organization": organization,
+                "occupation": occupation,
+            }
 
+        """
         address = data.get("addresses", [{"streetAddress": "Missing"}])[0].get(
             "streetAddress"
         )
