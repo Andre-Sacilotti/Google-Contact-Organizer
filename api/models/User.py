@@ -22,3 +22,21 @@ class User(Model):
     query_id = TextField()
     name = TextField()
     contacts_statistics = MapField()
+    
+    
+    @staticmethod
+    def statistics_to_chart(data):
+        
+        data = data['contacts_statistics']
+        
+        chart_data = {}
+
+        for key, item in data.items():
+            print(key, item)
+            chart_data[key] = {"label": [], "data": []}
+
+            for label, value in item.items():
+                chart_data[key]["label"].append(label)
+                chart_data[key]["data"].append(value)
+
+        return chart_data

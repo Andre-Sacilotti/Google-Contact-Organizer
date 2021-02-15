@@ -590,3 +590,5 @@ class Contact(Model):
             region_grouped[Contact._get_region(connection)] += 1
 
         return {"contacts": region_grouped}
+
+

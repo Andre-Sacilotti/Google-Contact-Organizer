@@ -31,13 +31,11 @@ model = user_namespace.model(
         460: "No authorization-code in headers",
         462: "Another errors",
         463: "Argument missing in request data",
-        465: "User Not Found"
+        465: "User Not Found",
     }
 )
-
 @user_namespace.route("/")
 class UserApi(Resource):
-    
     @user_namespace.header(
         "authorization-code",
         "OAuth2 Access Token given by google api.",
@@ -94,24 +92,42 @@ class UserApi(Resource):
                     "region": contacts_statistics_region["contacts"],
                 }
                 user.save()
-                return {'success': "User Saved"}, 200
+                return {"success": "User Saved"}, 200
 
             return contacts
 
         else:
             return NO_AUTH_CODE
-            
 
-    @user_namespace.doc(params={
-        'userId': "User unique id to get data on Firebase DB"
-    })
+    @user_namespace.doc(
+        params={
+            "userId": "User unique id to get data on Firebase DB",
+            "toChart": """Specify this =true if you wanna to retrive statistics \
+        in a format like:
+            'organization':
+             {
+                'label': ["Google", "Facebook", "Conecta Nuvem"],
+                'data': [25, 10, 259]
+            }
+        """,
+        }
+    )
     def get(self):
         print(request)
         data = request.args
         user_data = User.collection.filter(query_id=data.get("userId", None))
 
-        if user_data.get() is not None:
-            return user_data.get().to_dict(), 200
+        if data.get("toChart", None) == "true":
+            if user_data.get() is not None:
+                
+                return User.statistics_to_chart(
+                    user_data.get().to_dict()
+                ), 200
+                
+            else:
+                return {"error": "User not found."}, 465
         else:
-            return {'error': "User not found."}, 465
-
+            if user_data.get() is not None:
+                return user_data.get().to_dict(), 200
+            else:
+                return {"error": "User not found."}, 465
