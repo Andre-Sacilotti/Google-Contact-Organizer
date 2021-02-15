@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_restplus import Resource, Api
+import os
 
 application = Flask(__name__)
 
@@ -17,3 +18,4 @@ CORS(application, resources={r"/*": {"origins": "*"}})
 
 import api.user.user_api
 import api.contacts.contacts_api
+import api.reports.reports_api
